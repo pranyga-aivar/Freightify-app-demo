@@ -350,27 +350,27 @@ def process_main_folder_structure_incremental(main_folder_path, extraction_promp
         else:
             failed_subfolders += 1
     
-    print(f"\n🎯 Final Processing Summary:")
-    print(f"   ✅ Successfully processed: {successful_subfolders} subfolders")
-    print(f"   ❌ Failed to process: {failed_subfolders} subfolders")
-    print(f"   📁 Output folder: {output_main_folder}")
+    # print(f"\n🎯 Final Processing Summary:")
+    # print(f"   ✅ Successfully processed: {successful_subfolders} subfolders")
+    # print(f"   ❌ Failed to process: {failed_subfolders} subfolders")
+    # print(f"   📁 Output folder: {output_main_folder}")
     
-    # Create summary file
-    summary = {
-        "input_folder": main_folder_path,
-        "output_folder": output_main_folder,
-        "total_subfolders": len(subfolders),
-        "successful_subfolders": successful_subfolders,
-        "failed_subfolders": failed_subfolders,
-        "processed_subfolders": [name for _, name in subfolders],
-        "processing_mode": "incremental_writing"
-    }
+    # # Create summary file
+    # summary = {
+    #     "input_folder": main_folder_path,
+    #     "output_folder": output_main_folder,
+    #     "total_subfolders": len(subfolders),
+    #     "successful_subfolders": successful_subfolders,
+    #     "failed_subfolders": failed_subfolders,
+    #     "processed_subfolders": [name for _, name in subfolders],
+    #     "processing_mode": "incremental_writing"
+    # }
     
-    summary_path = os.path.join(output_main_folder, "processing_summary.json")
-    with open(summary_path, "w", encoding="utf-8") as f:
-        json.dump(summary, f, ensure_ascii=False, indent=2)
+    # summary_path = os.path.join(output_main_folder, "processing_summary.json")
+    # with open(summary_path, "w", encoding="utf-8") as f:
+    #     json.dump(summary, f, ensure_ascii=False, indent=2)
     
-    print(f"📋 Processing summary saved to: {summary_path}")
+    # print(f"📋 Processing summary saved to: {summary_path}")
 
 
 
