@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  freightify:
+    build: .
+    ports:
+      - "8080:8501"
+    environment:
+      AWS_REGION: "us-east-1"
+    container_name: freightify-app
+    restart: unless-stopped
