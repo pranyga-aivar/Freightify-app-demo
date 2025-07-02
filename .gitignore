@@ -3,5 +3,6 @@ __pycache__
 temp_inputfiles
 .env
 freightify_frontend.py
-validatgejson.py
+validatejson.py
 run.txt
+E:\AIVAR\Freightify-backup\extras

@@ -88,7 +88,7 @@ try:
     with open(default_prompt_file, 'r') as file:
         default_prompt = file.read()
 except FileNotFoundError:
-    file_contents = "Default prompt file not found"
+    default_prompt = "Default prompt file not found"
 
 if st.session_state.show_prompt:
     prompt_text = st.text_area("Edit your prompt below:", value=default_prompt, height=400)
@@ -196,7 +196,6 @@ if uploaded_file is not None:
     
     # Display file info
     st.info(f"📁 **File uploaded:** {uploaded_file.name} ({uploaded_file.size} bytes)")
-    
     #custom terms display
     # Add this right before the "Process Excel File" button
     if any(custom_terms.values()):
@@ -211,6 +210,9 @@ if uploaded_file is not None:
         st.session_state.processing_complete = False
     if "file_stem" not in st.session_state:
         st.session_state.file_stem = ""
+    file_stem = os.path.splitext(uploaded_file.name)[0]
+    st.write(file_stem)
+    output_main_folder = f"{file_stem}_processed_output"
 
     # Initialize session state at the top of your file
     if "show_download" not in st.session_state:
@@ -323,29 +325,290 @@ if uploaded_file is not None:
         file_stem = st.session_state.file_stem if hasattr(st.session_state, 'file_stem') else os.path.splitext(uploaded_file.name)[0]
         output_main_folder = f"{file_stem}_processed_output"
         
-        if os.path.exists(output_main_folder):
-            # Count files
-            file_count = sum([len(files) for r, d, files in os.walk(output_main_folder)])
+        root_folder = output_main_folder
+
+        # # Initialize session state for selected file display
+        # if "selected_json_file" not in st.session_state:
+        #     st.session_state.selected_json_file = None
+
+        # # Collect all JSON files first
+        # json_files = []
+        # for dirpath, dirnames, filenames in os.walk(root_folder):
+        #     for file in filenames:
+        #         if file.endswith(".json"):
+        #             file_path = os.path.join(dirpath, file)
+        #             # Store both the file name and full path
+        #             relative_path = os.path.relpath(dirpath, root_folder)
+        #             display_name = f"{relative_path}/{file}" if relative_path != "." else file
+        #             json_files.append({
+        #                 "display_name": display_name,
+        #                 "file_path": file_path,
+        #                 "file_name": file
+        #             })
+
+        # if json_files:
+        #     st.subheader("📁 Processed Files")
+        #     st.write(f"Found {len(json_files)} JSON file(s). Click on a file to view its contents:")
             
-            if file_count > 0:
-                st.write(f"Found {file_count} files in folder and subfolders")
+        #     # Create buttons for each JSON file
+        #     cols = st.columns(min(3, len(json_files)))  # Max 3 columns
+            
+        #     for idx, file_info in enumerate(json_files):
+        #         col_idx = idx % 3
+        #         with cols[col_idx]:
+        #             # Create a unique button for each file
+        #             if st.button(
+        #                 f"📄 {file_info['file_name']}", 
+        #                 key=f"json_btn_{idx}",
+        #                 help=f"View contents of {file_info['display_name']}"
+        #             ):
+        #                 st.session_state.selected_json_file = file_info
+            
+        #     # Display selected file content
+        #     if st.session_state.selected_json_file:
+        #         selected_file = st.session_state.selected_json_file
                 
-                # Create and download ZIP file
-                try:
-                    zip_data = create_zip_from_folder(output_main_folder)
+        #         st.markdown("---")
+        #         st.subheader(f"📄 {selected_file['display_name']}")
+                
+        #         try:
+        #             with open(selected_file['file_path'], "r", encoding="utf-8") as f:
+        #                 data = json.load(f)
+
+        #             # Add a clear button
+        #             col1, col2 = st.columns([1, 4])
+        #             with col1:
+        #                 if st.button("❌ Clear View", key="clear_json_view"):
+        #                     st.session_state.selected_json_file = None
+        #                     st.rerun()
                     
-                    st.download_button(
-                        label=f"📦 Download All Files as ZIP ({file_count} files)",
-                        data=zip_data,
-                        file_name=f"{os.path.basename(output_main_folder)}_all_files.zip",
-                        mime="application/zip"
-                    )
+        #             # Normalize and display JSON data
+        #             if isinstance(data, dict):
+        #                 df = pd.json_normalize(data)
+        #             elif isinstance(data, list):
+        #                 df = pd.json_normalize(data)
+        #             else:
+        #                 df = pd.DataFrame([data])
+
+        #             # Display as both table and raw JSON
+        #             tab1, tab2 = st.tabs(["📊 Table View", "📋 Raw JSON"])
+                    
+        #             with tab1:
+        #                 st.dataframe(df, use_container_width=True)
+                        
+        #                 # Add download button for this specific file
+        #                 csv_data = df.to_csv(index=False)
+        #                 st.download_button(
+        #                     label=f"📥 Download {selected_file['file_name']} as CSV",
+        #                     data=csv_data,
+        #                     file_name=f"{os.path.splitext(selected_file['file_name'])[0]}.csv",
+        #                     mime="text/csv"
+        #                 )
+                    
+        #             with tab2:
+        #                 st.json(data)
+
+        #         except Exception as e:
+        #             st.error(f"❌ Error reading {selected_file['file_path']}: {e}")
+        # else:
+        #     st.warning("⚠️ No JSON files found in the output folder.")
+
+
+        # Initialize session state for selected file display
+        if "selected_json_file" not in st.session_state:
+            st.session_state.selected_json_file = None
+
+        # Organize JSON files by folder
+        json_files_by_folder = {}
+        for dirpath, dirnames, filenames in os.walk(root_folder):
+            json_files_in_folder = []
+            for file in filenames:
+                if file.endswith(".json"):
+                    file_path = os.path.join(dirpath, file)
+                    json_files_in_folder.append({
+                        "file_name": file,
+                        "file_path": file_path
+                    })
+            
+            if json_files_in_folder:
+                relative_path = os.path.relpath(dirpath, root_folder)
+                folder_name = "Root" if relative_path == "." else relative_path
+                json_files_by_folder[folder_name] = json_files_in_folder
+
+        if json_files_by_folder:
+            st.subheader("📁 Processed Files")
+            
+            # Display files organized by folders
+            for folder_name, files in json_files_by_folder.items():
+                with st.expander(f"📂 {folder_name} ({len(files)} files)", expanded=True):
+                    cols = st.columns(min(3, len(files)))
+                    
+                    for idx, file_info in enumerate(files):
+                        col_idx = idx % 3
+                        with cols[col_idx]:
+                            button_key = f"json_btn_{folder_name}_{idx}"
+                            if st.button(
+                                f"📄 {file_info['file_name']}", 
+                                key=button_key,
+                                help=f"View contents of {file_info['file_name']}"
+                            ):
+                                st.session_state.selected_json_file = {
+                                    **file_info,
+                                    "folder": folder_name
+                                }
+            
+            # Display selected file content (same as above)
+            if st.session_state.selected_json_file:
+                # ... (same display logic as previous example)
+                selected_file = st.session_state.selected_json_file
+                
+                st.markdown("---")
+                # st.subheader(f"📄 {selected_file['display_name']}")
+                display_name = f"{selected_file['folder']}/{selected_file['file_name']}" if selected_file['folder'] != "Root" else selected_file['file_name']
+                st.subheader(f"📄 {display_name}")
+                
+                try:
+                    with open(selected_file['file_path'], "r", encoding="utf-8") as f:
+                        data = json.load(f)
+
+                    # Add a clear button
+                    col1, col2 = st.columns([1, 4])
+                    with col1:
+                        if st.button("❌ Clear View", key="clear_json_view"):
+                            st.session_state.selected_json_file = None
+                            st.rerun()
+                    
+                    # Normalize and display JSON data
+                    if isinstance(data, dict):
+                        df = pd.json_normalize(data)
+                    elif isinstance(data, list):
+                        df = pd.json_normalize(data)
+                    else:
+                        df = pd.DataFrame([data])
+
+                    # Display as both table and raw JSON
+                    tab1, tab2 = st.tabs(["📊 Table View", "📋 Raw JSON"])
+                    
+                    with tab1:
+                        st.dataframe(df, use_container_width=True)
+                        
+                        # # Add download button for this specific file
+                        # csv_data = df.to_csv(index=False)
+                        # st.download_button(
+                        #     label=f"📥 Download {selected_file['file_name']} as CSV",
+                        #     data=csv_data,
+                        #     file_name=f"{os.path.splitext(selected_file['file_name'])[0]}.csv",
+                        #     mime="text/csv"
+                        # )
+                    
+                    with tab2:
+                        st.json(data)
+
                 except Exception as e:
-                    st.error(f"❌ Error creating ZIP file: {str(e)}")
-            else:
-                st.error("No files found in the folder")
+                    st.error(f"❌ Error reading {selected_file['file_path']}: {e}")
         else:
-            st.error("Output folder not found")
+            st.warning("⚠️ No JSON files found in the output folder.")
+
+
+
+
+
+
+
+        # # Walk through all subfolders and get JSON files
+        # for dirpath, dirnames, filenames in os.walk(root_folder):
+        #     for file in filenames:
+        #         if file.endswith(".json"):
+        #             file_path = os.path.join(dirpath, file)
+        #             try:
+        #                 with open(file_path, "r", encoding="utf-8") as f:
+        #                     data = json.load(f)
+
+        #                 # Normalize if nested JSON
+        #                 if isinstance(data, dict):
+        #                     df = pd.json_normalize(data)
+        #                 elif isinstance(data, list):
+        #                     df = pd.json_normalize(data)
+        #                 else:
+        #                     df = pd.DataFrame([data])
+
+        #                 st.subheader(f"📄 {file}")
+        #                 st.dataframe(df)
+
+        #             except Exception as e:
+        #                 st.error(f"❌ Error reading {file_path}: {e}")
+
+
+
+
+
+        # if os.path.exists(output_main_folder):
+        #     # Count files
+        #     file_count = sum([len(files) for r, d, files in os.walk(output_main_folder)])
+            
+        #     if file_count > 0:
+        #         st.write(f"Found {file_count} files in folder and subfolders")
+                
+        #         # Create and download ZIP file
+        #         try:
+        #             zip_data = create_zip_from_folder(output_main_folder)
+                    
+        #             st.download_button(
+        #                 label=f"📦 Download All Files as ZIP ({file_count} files)",
+        #                 data=zip_data,
+        #                 file_name=f"{os.path.basename(output_main_folder)}_all_files.zip",
+        #                 mime="application/zip"
+        #             )
+        #         except Exception as e:
+        #             st.error(f"❌ Error creating ZIP file: {str(e)}")
+        #     else:
+        #         st.error("No files found in the folder")
+        # else:
+        #     st.error("Output folder not found")
+    # if st.session_state.show_download and not st.session_state.is_processing:
+
+    #     #     st.stop()
+    #     # Ensure file_stem is initialized correctly before accessing
+    #     # if "file_stem" not in st.session_state or not st.session_state.file_stem:
+    #     #     if uploaded_file is not None:
+    #     #         st.session_state.file_stem = os.path.splitext(uploaded_file.name)[0]
+    #     #     else:
+    #     #         st.error("❌ No file name found. Please re-upload the file to continue.")
+    #     #         st.stop()
+
+    #     # file_stem = st.session_state.file_stem if hasattr(st.session_state, 'file_stem') else os.path.splitext(uploaded_file.name)[0]
+    #     if "file_stem" in st.session_state and st.session_state.file_stem:
+    #          file_stem = st.session_state.file_stem
+    #     elif uploaded_file is not None:
+    #         file_stem = os.path.splitext(uploaded_file.name)[0]
+    #     else:
+    #         st.error("❌ No file name found. Please re-upload the file to continue.")
+    #         st.stop()
+    #     output_main_folder = f"{file_stem}_processed_output"
+    #     root_folder = output_main_folder
+
+    #     # Walk through all subfolders and get JSON files
+    #     for dirpath, dirnames, filenames in os.walk(root_folder):
+    #         for file in filenames:
+    #             if file.endswith(".json"):
+    #                 file_path = os.path.join(dirpath, file)
+    #                 try:
+    #                     with open(file_path, "r", encoding="utf-8") as f:
+    #                         data = json.load(f)
+
+    #                     # Normalize if nested JSON
+    #                     if isinstance(data, dict):
+    #                         df = pd.json_normalize(data)
+    #                     elif isinstance(data, list):
+    #                         df = pd.json_normalize(data)
+    #                     else:
+    #                         df = pd.DataFrame([data])
+
+    #                     st.subheader(f"📄 {file}")
+    #                     st.dataframe(df)
+
+    #                 except Exception as e:
+    #                     st.error(f"❌ Error reading {file_path}: {e}")
 
 
 else:

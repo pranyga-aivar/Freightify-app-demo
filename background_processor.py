@@ -78,7 +78,6 @@ def main():
                 "output_folder": output_main_folder,
                 "message": "Processing completed successfully!"
             }, f, ensure_ascii=False)
-
         
     except Exception as e:
         # Write error status
