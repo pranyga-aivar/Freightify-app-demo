@@ -281,6 +281,17 @@ if uploaded_file is not None:
                             st.info("⏳ Step 1/2: Preprocessing freight rates...")
                         elif step == 'extraction':
                             st.info("⏳ Step 2/2: Extracting data...")
+                            st.info("""
+                                    ⏳ **Processing in Progress**
+
+                                    Please note that this operation may take several minutes to complete, depending on the size and complexity of your file.
+
+                                    - **Do not refresh or close the browser tab during processing.**
+                                    - You may safely navigate away and return later to check the results.
+                                    - To check the current status, please click the **"Refresh Status"** button when you return.
+
+                                    Thank you for your patience!
+                                    """)
                         else:
                             st.info("⏳ Processing...")
                             
