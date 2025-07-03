@@ -141,7 +141,7 @@ def write_json_record_to_file(file_handle, record, is_first, file_lock):
         file_handle.flush()  # Ensure immediate write to disk
         is_first[0] = False
 
-def process_subfolder_pair_incremental(subfolder_path, subfolder_name, extraction_prompt_path, surge_charge_prompt_path, output_base_folder,context_filter_prompt_path=None):
+def process_subfolder_pair_incremental(subfolder_path, subfolder_name, extraction_prompt_path, output_base_folder,context_filter_prompt_path=None):
     """Process a single subfolder with incremental JSON writing"""
     print(f"\n📁 Processing subfolder: {subfolder_name}")
     
@@ -304,7 +304,7 @@ def process_subfolder_pair_incremental(subfolder_path, subfolder_name, extractio
         print(f"❌ Error processing {subfolder_name}: {e}")
         return False
 
-def process_main_folder_structure_incremental(main_folder_path, extraction_prompt_path, surge_charge_prompt_path, context_filter_prompt_path=None):
+def process_main_folder_structure_incremental(main_folder_path, extraction_prompt_path, context_filter_prompt_path=None):
     """Process main folder with incremental JSON writing"""
     
     if not os.path.exists(main_folder_path):
@@ -340,7 +340,6 @@ def process_main_folder_structure_incremental(main_folder_path, extraction_promp
             subfolder_path=subfolder_path,
             subfolder_name=subfolder_name,
             extraction_prompt_path=extraction_prompt_path,
-            surge_charge_prompt_path=surge_charge_prompt_path,
             output_base_folder=output_main_folder,
             context_filter_prompt_path=context_filter_prompt_path
         )
@@ -389,13 +388,12 @@ if __name__ == "__main__":
         extraction_prompt_path = default_prompt_file
         print(f"Using default prompt: {default_prompt_file}")  # Optional: for debugging
 
-    surge_charge_prompt_path = "s9.txt"
+    # surge_charge_prompt_path = "s9.txt"
     context_filter_prompt_path="context.txt"
     
     # Process the main folder structure with incremental writing
     process_main_folder_structure_incremental(
         main_folder_path=main_folder,
         extraction_prompt_path=extraction_prompt_path,
-        surge_charge_prompt_path=surge_charge_prompt_path,
         context_filter_prompt_path=context_filter_prompt_path
     )

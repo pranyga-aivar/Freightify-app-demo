@@ -60,14 +60,12 @@ def main():
         else:
             extraction_prompt_path = default_prompt_file
         
-        surge_charge_prompt_path = "s9.txt"
         context_filter_prompt_path = "context.txt"
         
         # Process the main folder structure with incremental writing
         process_main_folder_structure_incremental(
             main_folder_path=main_folder,
             extraction_prompt_path=extraction_prompt_path,
-            surge_charge_prompt_path=surge_charge_prompt_path,
             context_filter_prompt_path=context_filter_prompt_path
         )
         

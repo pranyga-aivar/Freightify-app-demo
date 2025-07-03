@@ -13,20 +13,20 @@ from preprocessing_freightrates import FreightTableExtractor
 
 st.title("Freightify - Excel processor")
 
-def create_zip_from_folder(folder_path):
-    """Create a ZIP file containing all files from folder and subfolders"""
-    zip_buffer = io.BytesIO()
+# def create_zip_from_folder(folder_path):
+#     """Create a ZIP file containing all files from folder and subfolders"""
+#     zip_buffer = io.BytesIO()
     
-    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-        for root, dirs, files in os.walk(folder_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                # Get relative path to maintain folder structure in ZIP
-                arcname = os.path.relpath(file_path, folder_path)
-                zip_file.write(file_path, arcname)
+#     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+#         for root, dirs, files in os.walk(folder_path):
+#             for file in files:
+#                 file_path = os.path.join(root, file)
+#                 # Get relative path to maintain folder structure in ZIP
+#                 arcname = os.path.relpath(file_path, folder_path)
+#                 zip_file.write(file_path, arcname)
     
-    zip_buffer.seek(0)
-    return zip_buffer.getvalue()
+#     zip_buffer.seek(0)
+#     return zip_buffer.getvalue()
 
 def sheetname_checkbox(file_path):
     try:
