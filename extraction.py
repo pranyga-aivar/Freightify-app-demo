@@ -373,27 +373,27 @@ def process_main_folder_structure_incremental(main_folder_path, extraction_promp
 
 
 
-if __name__ == "__main__":
-    # Configuration
-    main_folder = "all_templates/Cosco Shipping Lines Germany - FAK Ratesheet REEFER - 01.04. - 30.04.2025---3314-2025-04-08T08:28:47.958Z_processed"  # Main folder containing subfolders
-    # extraction_prompt_path = "f9.txt"
-    # Check for custom prompt file first, fallback to default
-    custom_prompt_file = 'custom_prompt.txt'
-    default_prompt_file = 'f9.txt'
+# if __name__ == "__main__":
+#     # Configuration
+#     main_folder = "all_templates/Cosco Shipping Lines Germany - FAK Ratesheet REEFER - 01.04. - 30.04.2025---3314-2025-04-08T08:28:47.958Z_processed"  # Main folder containing subfolders
+#     # extraction_prompt_path = "f9.txt"
+#     # Check for custom prompt file first, fallback to default
+#     custom_prompt_file = 'custom_prompt.txt'
+#     default_prompt_file = 'f9.txt'
 
-    if os.path.exists(custom_prompt_file):
-        extraction_prompt_path = custom_prompt_file
-        print(f"Using custom prompt: {custom_prompt_file}")  # Optional: for debugging
-    else:
-        extraction_prompt_path = default_prompt_file
-        print(f"Using default prompt: {default_prompt_file}")  # Optional: for debugging
+#     if os.path.exists(custom_prompt_file):
+#         extraction_prompt_path = custom_prompt_file
+#         print(f"Using custom prompt: {custom_prompt_file}")  # Optional: for debugging
+#     else:
+#         extraction_prompt_path = default_prompt_file
+#         print(f"Using default prompt: {default_prompt_file}")  # Optional: for debugging
 
-    # surge_charge_prompt_path = "s9.txt"
-    context_filter_prompt_path="context.txt"
+#     # surge_charge_prompt_path = "s9.txt"
+#     context_filter_prompt_path="context.txt"
     
-    # Process the main folder structure with incremental writing
-    process_main_folder_structure_incremental(
-        main_folder_path=main_folder,
-        extraction_prompt_path=extraction_prompt_path,
-        context_filter_prompt_path=context_filter_prompt_path
-    )
+#     # Process the main folder structure with incremental writing
+#     process_main_folder_structure_incremental(
+#         main_folder_path=main_folder,
+#         extraction_prompt_path=extraction_prompt_path,
+#         context_filter_prompt_path=context_filter_prompt_path
+#     )
